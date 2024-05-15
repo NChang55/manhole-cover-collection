@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import exifr from "exifr";
-import { MapContainer, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -35,7 +33,6 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
 
   const handleUpload = async () => {
     if (!selectedFile) return;
-    
     try {
       const gpsData = await exifr.gps(selectedFile);
       if (gpsData && gpsData.latitude && gpsData.longitude) {
@@ -56,23 +53,22 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
 //   };
 
   // upload file to Firebase
-//   const uploadFile = async () => {
-//     if (!selectedFile) return;
-//     const manholeCoversFolderRef = ref(
-//       storage,
-//       `manhole_covers/${selectedFile.name}`
-//     );
-//     const metadata = {
-//         contentType: 'image/jpeg',
-//       };
-//     try {
-//       const snapshot = await uploadBytes(manholeCoversFolderRef, selectedFile, metadata);
-//       const firebaseURL = await getDownloadURL(snapshot.ref);
-//       setImageURL(firebaseURL);
-//     } catch (err) {
-//       console.error("image upload unsuccessful :(", err);
-//     }
-//   };
+  const uploadFirebase = async () => {
+    if (!selectedFile) return;
+    const manholeCoversFolderRef = ref(
+      storage,
+      `manhole_covers/${selectedFile.name}`
+    );
+    try {
+      const snapshot = await uploadBytes(manholeCoversFolderRef, selectedFile);
+      const firebaseURL = await getDownloadURL(snapshot.ref);
+      setImageURL(firebaseURL);
+      console.log("firebase URL: ", firebaseURL);
+      alert("image upload successful!");
+    } catch (err) {
+      console.error("image upload unsuccessful :(", err);
+    }
+  };
 
   // upload to Database
 //   const uploadToDatabase = async () => {
@@ -97,7 +93,10 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
   return (
     <div>
     <input label="Select File" type="file" onChange={handleFileSelect} />
-      <button onClick={handleUpload}>Upload</button>
+      <button onClick={async () => {
+        await uploadFirebase();
+        handleUpload();
+      }}>Upload</button>
       {geolocation && (
         <div>
           <p>Latitude: {geolocation.lat}</p>

@@ -7,8 +7,7 @@ const knex = require('./knex');
 app.use(express.json());
 app.use(
     cors({
-      origin: process.env.FE_PATH,
-      credentials: true,
+      Origin: process.env.FE_PATH
     })
   );
 

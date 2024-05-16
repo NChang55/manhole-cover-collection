@@ -8,31 +8,26 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const CLIENT_URL = "http://localhost:5173";
 
 function App() {
-  const [allEntries, setAllEntries] = useState(null);
+  const [allEntries, setAllEntries] = useState([]);
 
   // useEffect
   useEffect(() => {
     getAllEntries();
-    console.log("yoooo");
     }, []);
 
   // handler functions
-  async function getAllEntries() { 
-    const entries = await fetch(`${BASE_URL}/allEntries`,
-    {
-      method: "GET",
-      headers: {
-        "Origin": `${CLIENT_URL}`,
-        "Access-Control-Request-Headers": "Content-Type",
-        "Content-Type": "application/json",
-        "Access-Control-Request-Method": "GET",
-      },
-    }) ;
-    console.log("base_url: ", BASE_URL);
-    console.log("all entries: ", entries);
+  async function getAllEntries() {
+    const entries = await fetch(`${BASE_URL}/allEntries`);
     const jsonentries = await entries.json();
     setAllEntries(jsonentries);
-    console.log(allEntries);
+  }
+
+  const handleImageClick = (url) => {
+    window.open(url, 'Image', 'width=800,height=450');
+  };
+
+  const handleUploadComplete = async () => {
+    getAllEntries();
   }
 
   return (
@@ -44,11 +39,18 @@ function App() {
          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[38.066862, 138.164063]}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Clickable URL to come.
-          </Popup>
-        </Marker>
+        {allEntries.map(entry => (
+          <Marker key={entry.entry_id} position={[entry.latitude, entry.longitude]}>
+            <Popup>
+              <button
+                onClick={() => handleImageClick(entry.image_url)}
+                style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+              >
+                View Image
+              </button>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
     </div>
   )

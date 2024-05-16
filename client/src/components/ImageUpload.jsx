@@ -9,7 +9,7 @@ import { storage } from "../../firebaseConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // import { select } from "../../../server/src/knex";
 
-export default function ImageUpload({ setIsNewEntry, handleClose }) {
+export default function ImageUpload({ uploadComplete }) {
   // USE STATE
   const [imageURL, setImageURL] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -17,11 +17,12 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
 
   // USE EFFECT
   
-//   useEffect(() => {
-//     if (imageURL) {
-//       handleUploadToDatabase();
-//     }
-//   }, [imageURL]);
+  useEffect(() => {
+    if (imageURL && geolocation) {
+      uploadDB();
+      window.location.reload(); //refresh page and get all entries again
+    }
+  }, [imageURL, geolocation]);
 
   // HANDLER FUCNTION
   const storage = getStorage();
@@ -29,14 +30,15 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
+    await extGeolocation(file);
   }
 
-  const handleUpload = async () => {
+  const extGeolocation = async (selectedFile) => {
     if (!selectedFile) return;
     try {
       const gpsData = await exifr.gps(selectedFile);
       if (gpsData && gpsData.latitude && gpsData.longitude) {
-        setGeolocation({ lat: gpsData.latitude, lng: gpsData.longitude });
+        setGeolocation({ latitude: gpsData.latitude, longitude: gpsData.longitude });
       } else {
         alert("No geolocation data found in the image.");
       }
@@ -45,12 +47,6 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
       alert("Failed to extract GPS data.");
     }
       }
-
-//   const handleUploadToDatabase = async () => {
-//     await uploadToDatabase();
-//     setIsNewEntry((prev) => prev + 1);
-//     handleClose();
-//   };
 
   // upload file to Firebase
   const uploadFirebase = async () => {
@@ -63,7 +59,6 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
       const snapshot = await uploadBytes(manholeCoversFolderRef, selectedFile);
       const firebaseURL = await getDownloadURL(snapshot.ref);
       setImageURL(firebaseURL);
-      console.log("firebase URL: ", firebaseURL);
       alert("image upload successful!");
     } catch (err) {
       console.error("image upload unsuccessful :(", err);
@@ -71,38 +66,38 @@ export default function ImageUpload({ setIsNewEntry, handleClose }) {
   };
 
   // upload to Database
-//   const uploadToDatabase = async () => {
-//     const username = localStorage.getItem("userId");
-//     const userID = Number(username);
-//     const token = localStorage.getItem("jwtToken");
-//     const response = await fetch(`${BASE_URL}/diaries`, {
-//       method: "POST",
-//       credentials: "include",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//       body: JSON.stringify({
-//         userID: userID,
-//         imageURL: imageURL,
-//       }),
-//     });
-//   };
+  const uploadDB = async () => {
+    if (!geolocation || !imageURL) return;
+    console.log("image URL: ", imageURL);
+
+    await fetch(`${BASE_URL}/newEntry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        latitude: geolocation.latitude,
+        longitude: geolocation.longitude,
+        img_url: imageURL,
+      }),
+    });
+  };
+
+  const handleUpload = async () => {
+    await uploadFirebase();
+  };
 
   // RETURN
   return (
     <div>
     <input label="Select File" type="file" onChange={handleFileSelect} />
-      <button onClick={async () => {
-        await uploadFirebase();
-        handleUpload();
-      }}>Upload</button>
-      {geolocation && (
+      <button onClick={handleUpload}>Upload</button>
+      {/* {geolocation && (
         <div>
-          <p>Latitude: {geolocation.lat}</p>
-          <p>Longitude: {geolocation.lng}</p>
+          <p>Latitude: {geolocation.latitude}</p>
+          <p>Longitude: {geolocation.longitude}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

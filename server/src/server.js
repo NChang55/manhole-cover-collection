@@ -7,7 +7,7 @@ const knex = require('./knex');
 app.use(express.json());
 app.use(
     cors({
-      Origin: process.env.FE_PATH
+      "Origin": process.env.FE_PATH
     })
   );
 
@@ -18,10 +18,20 @@ const setupServer = () => {
 
   app.get("/allEntries", async (req, res) => {
     let result = await knex("entry_info")
-      .select({entry_id: "entry_id", image_url: "image_url", latitude: "latitude", longtitude: "longtitude", created_on: "date_created"});
+      .select({entry_id: "entry_id", image_url: "image_url", latitude: "latitude", longitude: "longitude"});
 
     res.status(200).send(result);
   })
+
+  app.post("/newEntry", async (req, res) => {
+    const newEntry = req.body;
+    console.log(newEntry);
+    const post = await knex('entry_info').insert({
+      latitude: newEntry.latitude,
+      longitude: newEntry.longitude,
+      image_url: newEntry.img_url});
+    res.status(200).send(post);
+  });
 
   return app;
 }

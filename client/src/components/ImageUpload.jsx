@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import exifr from "exifr";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -27,6 +27,14 @@ export default function ImageUpload({ uploadComplete }) {
   // HANDLER FUCNTION
   const storage = getStorage();
 
+  // styling file select input button
+  const hiddenFileSelect = useRef(null);
+
+  const handleSelectClick = (event) => {
+    hiddenFileSelect.current.click();
+  };
+
+  // processing React file upload
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
@@ -90,14 +98,9 @@ export default function ImageUpload({ uploadComplete }) {
   // RETURN
   return (
     <div>
-    <input label="Select File" type="file" onChange={handleFileSelect} />
+    <button onClick={handleSelectClick}>Select</button>
+    <input type="file" ref={hiddenFileSelect} style={{display:"none"}} onChange={handleFileSelect} />
       <button onClick={handleUpload}>Upload</button>
-      {/* {geolocation && (
-        <div>
-          <p>Latitude: {geolocation.latitude}</p>
-          <p>Longitude: {geolocation.longitude}</p>
-        </div>
-      )} */}
     </div>
   );
 };

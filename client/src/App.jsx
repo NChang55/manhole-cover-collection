@@ -26,14 +26,12 @@ function App() {
     window.open(url, 'Image', 'width=800,height=450');
   };
 
-  const handleUploadComplete = async () => {
-    getAllEntries();
-  }
-
   return (
     <div className="main_content">
-      <h1>Manhole Covers Collection</h1>
-      <ImageUpload></ImageUpload>
+      <div className="header">
+        <h1>Manhole Covers Collection</h1>
+        <ImageUpload></ImageUpload>
+      </div>
       <MapContainer center={["38.066862", "138.164063"]} zoom={5} scrollWheelZoom={true}>
         <TileLayer
          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

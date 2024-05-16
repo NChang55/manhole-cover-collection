@@ -5,7 +5,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #7B90D2;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,7 +23,9 @@ body {
 
 h1 {
   font-size: 2em;
-  line-height: 1.1;
+  margin-top: 0px;
+  padding-top: 10px;
+  margin-bottom: 5px;
 }
 
 button {
@@ -34,9 +35,10 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #7B90D2;
+  background-color: transparent;
   color: white;
   cursor: pointer;
   transition: border-color 0.25s;
+  margin: 10px;
 }
 

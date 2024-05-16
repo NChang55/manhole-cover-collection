@@ -11,3 +11,9 @@
     align-self: center;
     margin: auto;
   }
+
+.header {
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("https://b2786218.smushcdn.com/2786218/wp-content/uploads/2022/05/NA2110_MANH_L39.jpg?lossy=2&strip=1&webp=1");
+    background-position: 30% 85%;
+    background-size: 120%;
+}
